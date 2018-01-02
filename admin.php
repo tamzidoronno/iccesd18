@@ -5,7 +5,7 @@ if(!mysql_select_db($dbname,$link_id)) die(mysql_error());
 
 if( isset($_POST['action']) )
   { if( $_POST['action']=="Delete" ) mysql_query("delete from submission where id='$_POST[id]' and pid='$_POST[pid]'");
-    else if( $_POST['action']=="Accept Abstract") {
+    else if( $_POST['action']=="Accept") {
 	  $a=mysql_query("UPDATE submission SET accept_reject = '5' where id='$_POST[id]' and pid='$_POST[pid]'");
 	  
 	  $qquery=mysql_query("select * from submission where id='$_POST[id]' and pid='$_POST[pid]'") ; $rrow=mysql_fetch_array($qquery) ;
@@ -16,7 +16,7 @@ if( isset($_POST['action']) )
 
 	  
 	}
-	else if( $_POST['action']=="Reject Abstract") {
+	else if( $_POST['action']=="Reject") {
 	  $b=mysql_query("UPDATE submission SET accept_reject = '6' where id='$_POST[id]' and pid='$_POST[pid]'");
 	  
 	  $qquery=mysql_query("select * from submission where id='$_POST[id]' and pid='$_POST[pid]'") ; $rrow=mysql_fetch_array($qquery) ;
