@@ -1,20 +1,44 @@
 <?php  session_start(); if( !isset($_SESSION['id']) ) header("location:submission.php");
-//$link_id = mysql_connect("localhost","iccesd_root","iccesd2018"); $dbname = "iccesd_iccesd"; $st="";
+//$link_id = mysql_connect("localhost","root",""); $dbname = "iccesd"; $st="";
 $link_id = mysql_connect("localhost","iccesd_iccesd","*iccesd18"); $dbname = "iccesd_iccesd"; $st="";
 if(!mysql_select_db($dbname,$link_id)) die(mysql_error());
 
 if( isset($_POST['action']) )
   { if( $_POST['action']=="Delete" ) mysql_query("delete from submission where id='$_POST[id]' and pid='$_POST[pid]'");
     else if( $_POST['action']=="Accept Abstract") {
-	  $paper=mysql_fetch_array("select title from submissions where id='$_POST[id]' and pid='$_POST[pid]'");
+	  $a=mysql_query("UPDATE submission SET accept_reject = '5' where id='$_POST[id]' and pid='$_POST[pid]'");
+	  
+	  $qquery=mysql_query("select * from submission where id='$_POST[id]' and pid='$_POST[pid]'") ; $rrow=mysql_fetch_array($qquery) ;
+	  $x = $rrow[email];
+	  $dd = str_replace("~", " , ", $x);
+	  $txt = "Dear Author(s),\n\n Your abstract (Paper id: $rrow[pid]) has been accepted for ICCESD 2018. Congratulations! \n\n You may now log-in to submit your Full Paper along with a two-page Executive Summary. The necessary templates are available at the 'Submission' page of the conference website (www.iccesd.com). \n\n\n\nThanking you\n\n---------------------\nDr. Abu Zakir Morshed\nOrgainizing Secretary, ICCESD 2018\n&\nProfessor, Department of Civil Engineering\nKhulna University of Engineering & Technology (KUET)\nKhulna 9203, Bangladesh\nEmail: iccesd2018@gmail.com\nPhone: +88041 769 471 ext. 239 (off.), +8801714 220 410 (cell)";
+	        mail("$dd","ICCESD 2018: Abstract accepted for ICCESD 2018",$txt,"From: ICCESD 2018 KUET <office@iccesd.com>\r\nCC: iccesd2018@gmail.com");
+
+	  
+	}
+	else if( $_POST['action']=="Reject Abstract") {
+	  $b=mysql_query("UPDATE submission SET accept_reject = '6' where id='$_POST[id]' and pid='$_POST[pid]'");
+	  
+	  $qquery=mysql_query("select * from submission where id='$_POST[id]' and pid='$_POST[pid]'") ; $rrow=mysql_fetch_array($qquery) ;
+	  $x = $rrow[email];
+	  $dd = str_replace("~", " , ", $x);
+	  $txt = "Dear Author(s),\n\n I regret to inform you that your abstract (Paper id: $rrow[pid]) has been declined by the Editorial Committee for ICCESD 2018. Sorry!  \n\n However, you may attend the conference by paying the necessary registration fees in due course. \n\n\n\nThanking you\n\n---------------------\nDr. Abu Zakir Morshed\nOrgainizing Secretary, ICCESD 2018\n&\nProfessor, Department of Civil Engineering\nKhulna University of Engineering & Technology (KUET)\nKhulna 9203, Bangladesh\nEmail: iccesd2018@gmail.com\nPhone: +88041 769 471 ext. 239 (off.), +8801714 220 410 (cell)";
+	        mail("$dd","ICCESD 2018: Decision on your abstract for ICCESD 2018",$txt,"From: ICCESD 2018 KUET <office@iccesd.com>\r\nCC: iccesd2018@gmail.com");
+	    		
+	}
+	else if( $_POST['action']=="Allow fullpaper") {
+	  $a=mysql_query("UPDATE submission SET fullpaper = '88' where id='$_POST[id]' and pid='$_POST[pid]'");
+	}
+	else if( $_POST['action']=="Restrict fullpaper") {
+	  $a=mysql_query("UPDATE submission SET fullpaper = '99' where id='$_POST[id]' and pid='$_POST[pid]'");
 	}
   }
 else if( isset($_POST['admin']) )
   { if( (($_POST['email'])=="admin") && (($_POST['pid'])=="admin") )
       { $_SESSION['id']=$_POST['email'];
-      header("Location: http://iccesd.com/admin.php"); 
-      }
-    
+      header("Location: http://iccesd.com/admin.php");
+      //change
+      }   
   }
 else if( isset($_POST['submit']) )
   { $_POST['title']=str_replace("'", "&#39;", $_POST['title']); $_POST['title']=str_replace('"', '&quot;', $_POST['title']);
@@ -68,7 +92,7 @@ function addauthor(no)
   
   <tr><td width="17%" rowspan="2" align="right" valign="bottom"><img src="images/h4-1.jpg" width="169" height="305" /></td>
     <td width="66%" align="center" style="font-size:28px; color:#696969; line-height:35px; padding-top:20px; padding-bottom:10px;"><span style="font-size:36px; font-family:'Brush Script MT';">4th</span> <b style="font-size:42px;">I</b>nternational <b style="font-size:42px;">C</b>onference on <br />
-      <b style="font-size:42px;">C</b>ivil <b style="font-size:42px;">E</b>ngineering for <b style="font-size:42px;">S</b>ustainable <b style="font-size:42px;">D</b>evelopment<br /><span style="font-size:38px; font-weight:bold; color:#006400;">IC</span><span style="font-size:38px; font-weight:bold; color:#c00000;">CE</span><span style="font-size:38px; font-weight:bold; color:#006400;">SD</span><span style="font-size:38px; font-weight:bold; font-family:'Brush Script MT'; color:#c00000;"> 2018</span> </td><td width="17%" valign="center" align="center"> <img src="images/h0.png" /> </td> </tr>
+      <b style="font-size:42px;">C</b>ivil <b style="font-size:42px;">E</b>ngineering for <b style="font-size:42px;">S</b>ustainable <b style="font-size:42px;">D</b>evelopment <?php echo $paper['pid']; ?><br /><span style="font-size:38px; font-weight:bold; color:#006400;">IC</span><span style="font-size:38px; font-weight:bold; color:#c00000;">CE</span><span style="font-size:38px; font-weight:bold; color:#006400;">SD</span><span style="font-size:38px; font-weight:bold; font-family:'Brush Script MT'; color:#c00000;"> 2018</span> </td><td width="17%" valign="center" align="center"> <img src="images/h0.png" /> </td> </tr>
     
   <tr>
     <td height="155" colspan="2" align="center" valign="bottom"> <img src="images/h4-2.jpg" width="200" height='150' />&nbsp;<img src="images/h4-3.jpg" width="200" height='150' />&nbsp;<img src="images/h4-4.jpg" width="200" height='150' />&nbsp;<img src="images/h4-5.jpg" width="200" height='150' /></td>  </tr>
@@ -79,7 +103,7 @@ function addauthor(no)
 	<tr>
 	  <td height="30" colspan="3" align="center" valign="middle">
 	  <fieldset style="width:95%; text-align:left;" >
-	  <legend style="font-size:20px;"><b>Submission Summary</b></legend>
+	  <legend style="font-size:20px;"><b>Submission Summary <?php echo $paper['pid']; ?></b></legend>
 	   <br />
 	  <table border="1" style="border-collapse:collapse; padding:4px;" width="60%">
 	   <tr align="center"><th>SL</th><th>Track</th><th>Amount</th></tr>
@@ -99,7 +123,19 @@ function addauthor(no)
 	   <?php 
 	   //$track=array("Structural and Earthquake Engineering","Geotechnical and Geological Engineering","Environmental Engineering","Transporatation Planning and Traffic Management","Water Resources Engineering","Construction Engineering and Management","Fire Engineering");
 	   for( $i=1, $query=mysql_query("select * from submission order by remarks,pid") ; $row=mysql_fetch_array($query) ; $i++ )
-	      { $color=""; if($i%2) $color="#eee"; echo "<tr bgcolor='$color'><td>".$track[substr($row['remarks'],-1)]."<br><br><form method='post'><input type='hidden' name='pid' value='$row[pid]' /><input type='hidden' name='id' value='$row[id]' /> <input type='submit' name='action' value='Delete' /> <br /><input type='submit' name='action' value='Accept Abstract' /></form></td><td><b>Paper ID</b>: $row[pid]<br><b>Title:</b> $row[title]<br><b>Author(s):</b> $row[author]<br><b>Contact:</b> $row[email] ($row[id])<br><b>Affiliation:</b> $row[affiliation]<br><b>Keyword(s):</b> $row[keyword]<br><b>Abstract:</b><br>$row[abstract]</td></tr>";
+	      { $color="";
+	  		if($row[accept_reject]==1){$color="green";}
+	        	else if($row[accept_reject]==2)
+	        	{$color="red";}
+	        	else if($row[accept_reject]==3)
+	        	{$color="orange";}
+	        	else if($row[accept_reject]==4)
+	        	{$color="violet";}
+	        	else if($row[accept_reject]==5)
+	        	{$color="cornflowerblue";}
+	        	else if($row[accept_reject]==6)
+	        	{$color="chocolate";}
+	          echo "<tr bgcolor='$color'><td>".$track[substr($row['remarks'],-1)]."<br><br><form method='post'><input type='hidden' name='pid' value='$row[pid]' /><input type='hidden' name='id' value='$row[id]' /> <input type='submit' name='action' value='Delete' /> <br /><input type='submit' name='action' value='Accept' /><input type='submit' name='action' value='Reject' /><br><input type='submit' name='action' value='Allow fullpaper' /><input type='submit' name='action' value='Restrict fullpaper' /></form></td><td><b>Paper ID</b>: $row[pid]<br><b>Title:</b> $row[title]<br><b>Author(s):</b> $row[author]<br><b>Contact:</b> $row[email] ($row[id])<br><b>Affiliation:</b> $row[affiliation]<br><b>Keyword(s):</b> $row[keyword]<br><b>Abstract:</b><br>$row[abstract]</td></tr>";
 		  }
 	   
 	   ?>
@@ -110,3 +146,4 @@ function addauthor(no)
 </div>
 </body>
 </html>
+
